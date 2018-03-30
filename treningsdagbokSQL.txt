@@ -1,0 +1,100 @@
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Treningsokt`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Treningsokt` (
+  `treningsoktID` INT NOT NULL AUTO_INCREMENT,
+  `dato` DATE NOT NULL,
+  `tidspunkt` TIME(6) NOT NULL,
+  `varighet` INT NOT NULL,
+  `form` INT NULL,
+  `prestasjon` INT NULL,
+  `notat` VARCHAR(300) NULL,
+  PRIMARY KEY (`treningsoktID`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Apparat`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Apparat` (
+  `ApparatID` INT NOT NULL AUTO_INCREMENT,
+  `navn` VARCHAR(45) NOT NULL,
+  `beskrivelse` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`ApparatID`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Ovelse`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Ovelse` (
+  `OvelseID` INT NOT NULL AUTO_INCREMENT,
+  `navn` VARCHAR(70) NOT NULL,
+  `apparat` INT NULL,
+  `beskrivelse` VARCHAR(200) NULL,
+  `antallKilo` INT NULL,
+  `antallSett` INT NULL,
+  PRIMARY KEY (`OvelseID`),
+  INDEX `fk_Ovelse_Apparat1_idx` (`apparat` ASC),
+  CONSTRAINT `fk_Ovelse_Apparat1`
+    FOREIGN KEY (`apparat`)
+    REFERENCES `mydb`.`Apparat` (`ApparatID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Ovelsesgruppe`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Ovelsesgruppe` (
+  `ovelsesgruppeID` INT NOT NULL AUTO_INCREMENT,
+  `navn` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`ovelsesgruppeID`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`TreningsoktHarOvelse`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`TreningsoktHarOvelse` (
+  `Treningsokt_treningsoktID` INT NOT NULL,
+  `Ovelse_OvelseID` INT NOT NULL,
+  PRIMARY KEY (`Treningsokt_treningsoktID`, `Ovelse_OvelseID`),
+  INDEX `fk_Treningsokt_has_Ovelse_Ovelse1_idx` (`Ovelse_OvelseID` ASC),
+  INDEX `fk_Treningsokt_has_Ovelse_Treningsokt1_idx` (`Treningsokt_treningsoktID` ASC),
+  CONSTRAINT `fk_Treningsokt_has_Ovelse_Treningsokt1`
+    FOREIGN KEY (`Treningsokt_treningsoktID`)
+    REFERENCES `mydb`.`Treningsokt` (`treningsoktID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Treningsokt_has_Ovelse_Ovelse1`
+    FOREIGN KEY (`Ovelse_OvelseID`)
+    REFERENCES `mydb`.`Ovelse` (`OvelseID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`OvelseHarOvelsesgruppe`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`OvelseHarOvelsesgruppe` (
+  `ovelsesgruppeID` INT NOT NULL,
+  `ovelseID` INT NOT NULL,
+  PRIMARY KEY (`ovelsesgruppeID`, `ovelseID`),
+  INDEX `fk_Ovelsesgruppe_has_Ovelse_Ovelse1_idx` (`ovelseID` ASC),
+  INDEX `fk_Ovelsesgruppe_has_Ovelse_Ovelsesgruppe1_idx` (`ovelsesgruppeID` ASC),
+  CONSTRAINT `fk_Ovelsesgruppe_has_Ovelse_Ovelsesgruppe1`
+    FOREIGN KEY (`ovelsesgruppeID`)
+    REFERENCES `mydb`.`Ovelsesgruppe` (`ovelsesgruppeID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Ovelsesgruppe_has_Ovelse_Ovelse1`
+    FOREIGN KEY (`ovelseID`)
+    REFERENCES `mydb`.`Ovelse` (`OvelseID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
